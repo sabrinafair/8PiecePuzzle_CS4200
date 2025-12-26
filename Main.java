@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Random;
 import java.util.ArrayList;
+import puzzleSolver.HelperFunctions;
 /*------------------------------------------------------
 ------------------CS 4200: Project 1--------------------
 --------------------------------------------------------
@@ -18,17 +19,28 @@ Program Desc:	This porgram takes a 8 piece puzzle and
 --------------------------------------------------------
 --------------------------------------------------------
 --------------------------------------------------------*/
+import puzzleSolver.HelperFunctions.IntPair;
 
 public class Main {
-	public record IntPair(int first, int second) {}
+//	public record IntPair(int first, int second) {}
 	
-	public static void displayMenu() {
+	public static IntPair displayMenu(Scanner scan) {
 		System.out.println("-------------------");
 		System.out.println("Single Test Puzzle");
 		System.out.println("-------------------");
 		System.out.println("Select Input Method");
 		System.out.println("[1] -------- Random");
 		System.out.println("[2] -------- Manual");
+		int inputOption = scan.nextInt(); //for random or manual option
+		scan.nextLine();
+		System.out.println("Select H Function");
+		System.out.println("[1] -------- H1");
+		System.out.println("[2] -------- H2");
+		
+		int hOption = scan.nextInt(); 
+		scan.nextLine();
+		
+		return new IntPair(inputOption, hOption);
 	}
 	
 	public static void displayPuzzle(String str) {
@@ -39,7 +51,7 @@ public class Main {
 				if((i + 1) % 3 == 0) System.out.println();
 			}
 		}else {//if input size is incorrrect
-			System.out.println("INPUT SIZE INCORRECT");
+			System.out.println("Input size incorrect");
 		}
 	}
 	
@@ -51,60 +63,11 @@ public class Main {
 		for(int i = puzzle.length() - 1; i >= 0; i--) {
 			int randomIndex = rand.nextInt(i + 1);
 			
-			//swap char at random index with char at i
-//			char temp = puzzle.charAt(randomIndex);
-//			puzzle.setCharAt(randomIndex, puzzle.charAt(i));
-//			puzzle.setCharAt(i, temp);
-			swapIndex(puzzle, randomIndex, i);
+			HelperFunctions.swapIndex(puzzle, randomIndex, i);
 			
 		}
 
 		return puzzle.toString();
-	}
-	
-	public static void swapIndex(StringBuilder puzzle, int firstIndex, int secondIndex) {
-		//swap char at random index with char at i
-		char temp = puzzle.charAt(firstIndex);
-		puzzle.setCharAt(firstIndex, puzzle.charAt(secondIndex));
-		puzzle.setCharAt(secondIndex, temp);
-	}
-	
-	public static int getH1(String puzzle) {
-		int countMisplaced = 0; //hold how many pieces are misplaced
-		
-		for(int i = 0; i < puzzle.length(); i++) {
-			if(puzzle.charAt(i) != i) countMisplaced++;
-		}
-
-		return countMisplaced;
-	}
-	
-	public static IntPair getPuzzlePieceIndex(int num) {
-		int j = num;
-		int i = 0;
-		while(j >= 3) {
-			j = j - 3;
-			i++;
-		}
-		return new IntPair(i, j);
-	}
-	
-	public static int getPuzzleOffset(IntPair currPlace, IntPair goalPlace) {		
-		IntPair offset = new IntPair(Math.abs(currPlace.first - goalPlace.first), Math.abs(currPlace.second - goalPlace.second));	
-		return offset.first + offset.second;
-	}
-	
-	public static int getH2(String puzzle) {
-		int totalOffset = 0;
-		
-		for(int i = 0; i < puzzle.length(); i++) {
-			int currNum = puzzle.charAt(i) - '0'; //prevent error on char to int conversion
-			IntPair currPlace = getPuzzlePieceIndex(i);
-			IntPair goalPlace = getPuzzlePieceIndex(currNum);
-			totalOffset += getPuzzleOffset(currPlace, goalPlace);
-		}
-
-		return totalOffset;
 	}
 	
 	public static void outputSteps(PQNodeEntry node) {
@@ -112,9 +75,14 @@ public class Main {
 		Stack<String> steps = new Stack<>();
 		boolean reachedRoot = false;
 		
+		int totalH1 = 0;
+		int totalH2 = 0;
+		
 		//add all to stack to output in order
 			while(!reachedRoot) {
 				steps.add(currNode.getPuzzle());
+				totalH1 += currNode.getH1();
+				totalH2 += currNode.getH2();
 				currNode = currNode.getParentNode();
 				if(currNode.getParentNode() == null) {
 					reachedRoot = true;
@@ -129,6 +97,9 @@ public class Main {
 			displayPuzzle(steps.pop());
 			stepCount++;
 		}
+		
+		System.out.println("H1 Search Cost: " + totalH1);
+		System.out.println("H2 Search Cost: " + totalH2);
 		
 	}
 	
@@ -157,27 +128,12 @@ public class Main {
 			for(int j = i + 1; j < puzzle.length(); j++) {
 				int currPiece = puzzle.charAt(j) + '0';
 				if(checkPiece > currPiece) totalInversions++;
-		}
+			}
 		}
 		
 		boolean solvable = (totalInversions % 2 == 0);
 
 		return solvable;
-	}
-	
-	public static void pushOptionToPQ(int startIndex, int toIndex, PQNodeEntry parentNode, PriorityQueue PQ_H1, PriorityQueue PQ_H2) {
-		if(toIndex != -1) {
-			StringBuilder currPuzzle = new StringBuilder(parentNode.getPuzzle());
-			swapIndex(currPuzzle, startIndex, toIndex);
-			
-			int h1 = getH1(currPuzzle.toString());
-			int h2 = getH2(currPuzzle.toString());
-			int totalCost_h1 = parentNode.getG() + 1 + h1;
-			int totalCost_h2 = parentNode.getG() + 1 + h2;
-			
-			PQ_H1.add(new PQNodeEntry(currPuzzle.toString(), totalCost_h1, parentNode, parentNode.getG() + 1));
-			PQ_H2.add(new PQNodeEntry(currPuzzle.toString(), totalCost_h2, parentNode, parentNode.getG() + 1));
-		}
 	}
 	
 	public static void insertOptions(PQNodeEntry parentNode, PriorityQueue PQ_H1, PriorityQueue PQ_H2) {
@@ -188,9 +144,9 @@ public class Main {
 		int upIndex = emptyTileIndex - 3;
 		int downIndex = emptyTileIndex + 3;
 		
-		int currLevel = getPuzzlePieceIndex(emptyTileIndex).first;
-		int leftLevel = getPuzzlePieceIndex(leftIndex).first;
-		int rightLevel = getPuzzlePieceIndex(rightIndex).first;
+		int currLevel = HelperFunctions.getPuzzlePieceIndex(emptyTileIndex).first();
+		int leftLevel = HelperFunctions.getPuzzlePieceIndex(leftIndex).first();
+		int rightLevel = HelperFunctions.getPuzzlePieceIndex(rightIndex).first();
 		
 		//check if indecies are available
 		if(currLevel != leftLevel) leftIndex = -1;
@@ -199,15 +155,15 @@ public class Main {
 		if(downIndex > 8) downIndex = -1;
 		
 		//push options to Priority Queue
-		pushOptionToPQ(emptyTileIndex, leftIndex, parentNode, PQ_H1, PQ_H2);
-		pushOptionToPQ(emptyTileIndex, rightIndex, parentNode, PQ_H1, PQ_H2);
-		pushOptionToPQ(emptyTileIndex, upIndex, parentNode, PQ_H1, PQ_H2);
-		pushOptionToPQ(emptyTileIndex, downIndex, parentNode, PQ_H1, PQ_H2);
+		HelperFunctions.pushOptionToPQ(emptyTileIndex, leftIndex, parentNode, PQ_H1, PQ_H2);
+		HelperFunctions.pushOptionToPQ(emptyTileIndex, rightIndex, parentNode, PQ_H1, PQ_H2);
+		HelperFunctions.pushOptionToPQ(emptyTileIndex, upIndex, parentNode, PQ_H1, PQ_H2);
+		HelperFunctions.pushOptionToPQ(emptyTileIndex, downIndex, parentNode, PQ_H1, PQ_H2);
 		
 		
 	}
 	
-	public static void solvePuzzle(String puzzle) {
+	public static void solvePuzzle(String puzzle, int hOption) {
 		String currPuzzle = puzzle;
 		
 		List<String> visited = new ArrayList<>();
@@ -216,13 +172,13 @@ public class Main {
 		
 		int stepCount = 0;
 		int g = 0;
-		int h1Start = getH1(puzzle);
-		int h2Start = getH2(puzzle);
+		int h1Start = HelperFunctions.getH1(puzzle);
+		int h2Start = HelperFunctions.getH2(puzzle);
 		int totalCost_h1 = g + h1Start;
 		int totalCost_h2 = g + h2Start;
 		
-		PQNodeEntry parentNode_h1 = new PQNodeEntry(puzzle, totalCost_h1, null, g);
-		PQNodeEntry parentNode_h2 = new PQNodeEntry(puzzle, totalCost_h2, null, g);
+		PQNodeEntry parentNode_h1 = new PQNodeEntry(puzzle, totalCost_h1, null, g, h1Start, h2Start);
+		PQNodeEntry parentNode_h2 = new PQNodeEntry(puzzle, totalCost_h2, null, g, h1Start, h2Start);
 		Frontier_H1.add(parentNode_h1);
 		Frontier_H2.add(parentNode_h2);
 //		visited.add(currPuzzle);
@@ -232,15 +188,15 @@ public class Main {
 			stepCount++;
 			
 			//pop lowest on queue & check if final state
-			if(Frontier_H2.peek().getPuzzle().equals("012345678")) {
+			if((hOption == 1 ? Frontier_H1 : Frontier_H2).peek().getPuzzle().equals("012345678")) {
 				solved = true;
 				break;
 			}
 			
-			PQNodeEntry currNode = Frontier_H2.poll();
+			PQNodeEntry currNode = (hOption == 1 ? Frontier_H1 : Frontier_H2).poll();
 			
 			while(visited.contains(currNode.getPuzzle())) {
-				currNode = Frontier_H2.poll();
+				currNode = (hOption == 1 ? Frontier_H1 : Frontier_H2).poll();
 			}
 			
 			insertOptions(currNode, Frontier_H1, Frontier_H2);
@@ -248,7 +204,7 @@ public class Main {
 			//add to visited list
 			visited.add(currNode.getPuzzle());	
 		}
-		PQNodeEntry currNode = Frontier_H2.poll();
+		PQNodeEntry currNode = (hOption == 1 ? Frontier_H1 : Frontier_H2).poll();
 		outputSteps(currNode);
 
 	}
@@ -265,13 +221,13 @@ public class Main {
 		//	#3 #4 #5
 		//	#6 #7 #8
 		//0 represents the empty tile.
-		
 		Scanner scanner = new Scanner(System.in);
 		System.out.println("CS 4200 - Project 1");
-		displayMenu();
+		IntPair input = displayMenu(scanner);
+		int inputOption = input.first();
+		int hOption = input.second();
 		
-		int inputOption = scanner.nextInt(); //for random or manual option
-		scanner.nextLine();
+
 		
 		boolean solvable = true;
 		
@@ -288,7 +244,7 @@ public class Main {
 				solvable = checkSolvable(puzzle);
 				if(solvable) {
 					//solve puzzle here
-					solvePuzzle(puzzle);
+					solvePuzzle(puzzle, hOption);
 				}else {
 					System.out.println("Puzzle is Not Solvable");
 				}
@@ -306,7 +262,7 @@ public class Main {
 				solvable = checkSolvable(puzzleInput);
 				if(solvable) {
 					//solve puzzle here
-					solvePuzzle(puzzleInput);
+					solvePuzzle(puzzleInput, hOption);
 				}else {
 					System.out.println("Puzzle is Not Solvable");
 				}
