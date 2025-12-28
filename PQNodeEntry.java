@@ -5,17 +5,15 @@ public class PQNodeEntry implements Comparable<PQNodeEntry> {
 	private String puzzle;
 	private int cost;
 	private int g;
-	private int h1;
-	private int h2;
+	private int h;
 	private PQNodeEntry parent;
 
-	public PQNodeEntry(String puzzle, int cost, PQNodeEntry parent, int g, int h1, int h2) {
+	public PQNodeEntry(String puzzle, int cost, PQNodeEntry parent, int g, int h) {
 //		super();
 		this.puzzle = puzzle;
 		this.cost = cost;
 		this.g = g;
-		this.h1 = h1;
-		this.h2 = h2;
+		this.h = h;
 		this.parent = parent;
 	}
 
@@ -31,12 +29,8 @@ public class PQNodeEntry implements Comparable<PQNodeEntry> {
 		return g;
 	}
 	
-	public int getH1() {
-		return h1;
-	}
-	
-	public int getH2() {
-		return h2;
+	public int getH() {
+		return h;
 	}
 	
 	public int getCost() {

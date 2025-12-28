@@ -1,11 +1,16 @@
 package puzzleSolver;
 import java.util.Arrays;
 import java.util.Stack;
+import java.util.function.Function;
 import java.util.PriorityQueue;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Random;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import puzzleSolver.HelperFunctions;
 /*------------------------------------------------------
@@ -22,7 +27,6 @@ Program Desc:	This porgram takes a 8 piece puzzle and
 import puzzleSolver.HelperFunctions.IntPair;
 
 public class Main {
-//	public record IntPair(int first, int second) {}
 	
 	public static IntPair displayMenu(Scanner scan) {
 		System.out.println("-------------------");
@@ -70,19 +74,17 @@ public class Main {
 		return puzzle.toString();
 	}
 	
-	public static void outputSteps(PQNodeEntry node) {
+	public static int outputSteps(PQNodeEntry node) {
 		PQNodeEntry currNode = node;
 		Stack<String> steps = new Stack<>();
 		boolean reachedRoot = false;
 		
-		int totalH1 = 0;
-		int totalH2 = 0;
+		int totalH = 0;
 		
 		//add all to stack to output in order
 			while(!reachedRoot) {
 				steps.add(currNode.getPuzzle());
-				totalH1 += currNode.getH1();
-				totalH2 += currNode.getH2();
+				totalH += currNode.getH();
 				currNode = currNode.getParentNode();
 				if(currNode.getParentNode() == null) {
 					reachedRoot = true;
@@ -98,8 +100,8 @@ public class Main {
 			stepCount++;
 		}
 		
-		System.out.println("H1 Search Cost: " + totalH1);
-		System.out.println("H2 Search Cost: " + totalH2);
+		System.out.println("Search Cost: " + totalH);
+		return totalH;
 		
 	}
 	
@@ -125,8 +127,10 @@ public class Main {
 		int totalInversions = 0;
 		for(int i = 0; i < puzzle.length() - 1; i++) {
 			int checkPiece = puzzle.charAt(i) + '0';
+			if(checkPiece == 0) continue;
 			for(int j = i + 1; j < puzzle.length(); j++) {
 				int currPiece = puzzle.charAt(j) + '0';
+				if(currPiece == 0) continue;
 				if(checkPiece > currPiece) totalInversions++;
 			}
 		}
@@ -136,7 +140,7 @@ public class Main {
 		return solvable;
 	}
 	
-	public static void insertOptions(PQNodeEntry parentNode, PriorityQueue PQ_H1, PriorityQueue PQ_H2) {
+	public static void insertOptions(PQNodeEntry parentNode, PriorityQueue PQ, Function<String, Integer> getH) {
 		int emptyTileIndex = parentNode.getPuzzle().indexOf('0');
 		
 		int leftIndex = emptyTileIndex - 1;
@@ -155,59 +159,102 @@ public class Main {
 		if(downIndex > 8) downIndex = -1;
 		
 		//push options to Priority Queue
-		HelperFunctions.pushOptionToPQ(emptyTileIndex, leftIndex, parentNode, PQ_H1, PQ_H2);
-		HelperFunctions.pushOptionToPQ(emptyTileIndex, rightIndex, parentNode, PQ_H1, PQ_H2);
-		HelperFunctions.pushOptionToPQ(emptyTileIndex, upIndex, parentNode, PQ_H1, PQ_H2);
-		HelperFunctions.pushOptionToPQ(emptyTileIndex, downIndex, parentNode, PQ_H1, PQ_H2);
-		
-		
+		HelperFunctions.pushOptionToPQ(emptyTileIndex, leftIndex, parentNode, PQ, getH );
+		HelperFunctions.pushOptionToPQ(emptyTileIndex, rightIndex, parentNode, PQ, getH );
+		HelperFunctions.pushOptionToPQ(emptyTileIndex, upIndex, parentNode, PQ, getH );
+		HelperFunctions.pushOptionToPQ(emptyTileIndex, downIndex, parentNode, PQ, getH );
 	}
 	
-	public static void solvePuzzle(String puzzle, int hOption) {
+	public static int solvePuzzle(String puzzle, boolean h1, long startTime) {
 		String currPuzzle = puzzle;
 		
+		
 		List<String> visited = new ArrayList<>();
-		PriorityQueue<PQNodeEntry> Frontier_H1 = new PriorityQueue<>();
-		PriorityQueue<PQNodeEntry> Frontier_H2 = new PriorityQueue<>();	
+		PriorityQueue<PQNodeEntry> Frontier = new PriorityQueue<>();	
 		
 		int stepCount = 0;
 		int g = 0;
-		int h1Start = HelperFunctions.getH1(puzzle);
-		int h2Start = HelperFunctions.getH2(puzzle);
-		int totalCost_h1 = g + h1Start;
-		int totalCost_h2 = g + h2Start;
+		int hStart = h1 ? HelperFunctions.getH1(puzzle) : HelperFunctions.getH2(puzzle);
+		int totalCost = g + hStart;
 		
-		PQNodeEntry parentNode_h1 = new PQNodeEntry(puzzle, totalCost_h1, null, g, h1Start, h2Start);
-		PQNodeEntry parentNode_h2 = new PQNodeEntry(puzzle, totalCost_h2, null, g, h1Start, h2Start);
-		Frontier_H1.add(parentNode_h1);
-		Frontier_H2.add(parentNode_h2);
-//		visited.add(currPuzzle);
+		PQNodeEntry parentNode = new PQNodeEntry(puzzle, totalCost, null, g, hStart);
+		Frontier.add(parentNode);
+		
 		boolean solved = false;
+		boolean couldNotComplete = false;
+		long timeDuration = System.nanoTime();
 		
-		while(!solved) {
+		
+		while(!solved && !couldNotComplete) {
+			timeDuration = (System.nanoTime() - startTime) / 1_000_000_000;
+			if(timeDuration > 10) {
+				System.out.println("COULDN'T COMPLETE");
+				couldNotComplete = true;
+				break;
+			}
 			stepCount++;
 			
 			//pop lowest on queue & check if final state
-			if((hOption == 1 ? Frontier_H1 : Frontier_H2).peek().getPuzzle().equals("012345678")) {
+			if(Frontier.peek().getPuzzle().equals("012345678")) {
 				solved = true;
 				break;
 			}
 			
-			PQNodeEntry currNode = (hOption == 1 ? Frontier_H1 : Frontier_H2).poll();
+			PQNodeEntry currNode = Frontier.poll();
 			
 			while(visited.contains(currNode.getPuzzle())) {
-				currNode = (hOption == 1 ? Frontier_H1 : Frontier_H2).poll();
+				currNode = Frontier.poll();
 			}
 			
-			insertOptions(currNode, Frontier_H1, Frontier_H2);
+			if(h1) insertOptions(currNode, Frontier, HelperFunctions::getH1);
+			else  insertOptions(currNode, Frontier, HelperFunctions::getH2);
 
 			//add to visited list
 			visited.add(currNode.getPuzzle());	
 		}
-		PQNodeEntry currNode = (hOption == 1 ? Frontier_H1 : Frontier_H2).poll();
-		outputSteps(currNode);
-
-	}
+		PQNodeEntry currNode = Frontier.poll();
+		return couldNotComplete ? -1 : outputSteps(currNode);
+	}	
+//	public static void solvePuzzleH2(String puzzle) {
+//		String currPuzzle = puzzle;
+//		
+//		
+//		List<String> visited = new ArrayList<>();
+//		PriorityQueue<PQNodeEntry> Frontier_H2 = new PriorityQueue<>();	
+//		
+//		int stepCount = 0;
+//		int g = 0;
+//		int h2Start = HelperFunctions.getH2(puzzle);
+//		int totalCost_h2 = g + h2Start;
+//		
+//		PQNodeEntry parentNode_h2 = new PQNodeEntry(puzzle, totalCost_h2, null, g, h1Start, h2Start);
+//		Frontier_H2.add(parentNode_h2);
+//		
+//		boolean solved = false;
+//		
+//		while(!solved) {
+//			stepCount++;
+//			
+//			//pop lowest on queue & check if final state
+//			if(Frontier_H2.peek().getPuzzle().equals("012345678")) {
+//				solved = true;
+//				break;
+//			}
+//			
+//			PQNodeEntry currNode = Frontier_H2.poll();
+//			
+//			while(visited.contains(currNode.getPuzzle())) {
+//				currNode = Frontier_H2.poll();
+//			}
+//			
+//			insertOptions(currNode, Frontier_H2);
+//
+//			//add to visited list
+//			visited.add(currNode.getPuzzle());	
+//		}
+//		PQNodeEntry currNode = Frontier_H2.poll();
+//		outputSteps(currNode);
+//	}
 
 	public static void main(String[] args) {
 		// PUZZLE OF FORM
@@ -226,8 +273,7 @@ public class Main {
 		IntPair input = displayMenu(scanner);
 		int inputOption = input.first();
 		int hOption = input.second();
-		
-
+		boolean h1 = (hOption == 1);
 		
 		boolean solvable = true;
 		
@@ -240,11 +286,14 @@ public class Main {
 				
 				System.out.println("Puzzle: ");
 				displayPuzzle(puzzle);
+				long startTime = System.nanoTime();
+				long endTime = System.nanoTime();
 				
 				solvable = checkSolvable(puzzle);
 				if(solvable) {
 					//solve puzzle here
-					solvePuzzle(puzzle, hOption);
+					
+					solvePuzzle(puzzle, h1, startTime);
 				}else {
 					System.out.println("Puzzle is Not Solvable");
 				}
@@ -253,20 +302,96 @@ public class Main {
 				//read manual input of puzzle
 
 				System.out.println("Input Puzzle: ");
-				String puzzleInput = scanner.nextLine();
+				String puzzleInput = "";
+				
+				
+				while(scanner.hasNextLine()) {
+					String line = scanner.nextLine();
+					if(line == null || line.isEmpty()) break;
+					puzzleInput = puzzleInput + line.replaceAll("\\s+", "");
+				}
 
 
 				System.out.println("Puzzle: ");
+				System.out.println(puzzleInput);
 				displayPuzzle(puzzleInput);
+				long startTime = System.nanoTime();
+				long endTime = System.nanoTime();
 				
 				solvable = checkSolvable(puzzleInput);
 				if(solvable) {
 					//solve puzzle here
-					solvePuzzle(puzzleInput, hOption);
+					solvePuzzle(puzzleInput, h1, startTime);
 				}else {
 					System.out.println("Puzzle is Not Solvable");
 				}
 				
+				
+			}else if(inputOption == 3) {
+				//secret input option used to read in file of puzzles for data purposes and testing
+
+				System.out.println("Input File Path");
+				String filePath = scanner.nextLine();
+				Path path = Paths.get(filePath);
+				Path fileName = path.getFileName();
+				int puzzleCount = 0;
+				int costTotal = 0;
+				long totalTimeNano = 0;
+				long totalTimeMili = 0;
+				
+				
+				
+
+				try {
+				Scanner readFile = new Scanner(new File(filePath));
+				
+				while(readFile.hasNextLine()) {
+					String line = readFile.nextLine();
+					int currCostTotal = 0;
+					
+					if(line.contains("//")) continue;
+					
+					String puzzle = line.replaceAll("\\s+", "") + readFile.nextLine().replaceAll("\\s+", "") + readFile.nextLine().replaceAll("\\s+", "");
+					System.out.println("Puzzle: ");
+					displayPuzzle(puzzle);
+					
+					long startTime = System.nanoTime();
+					long endTime = System.nanoTime();
+					long durationTimeNano = 0;
+					long durationTimeMili = 0;
+					
+					solvable = checkSolvable(puzzle);
+					if(solvable) {
+						//solve puzzle here
+						puzzleCount++;
+						System.out.println("Puzzle #" + puzzleCount);
+						currCostTotal = solvePuzzle(puzzle, h1, startTime);
+						if(currCostTotal == -1) {
+							puzzleCount--;
+						}else {
+							endTime = System.nanoTime();
+							costTotal += currCostTotal;
+							durationTimeNano = endTime - startTime;
+							durationTimeMili = durationTimeNano / 1_000_000;
+							System.out.println("Time ns: " + durationTimeNano);
+							System.out.println("Time ms: " + durationTimeMili);
+							totalTimeNano = totalTimeNano +  durationTimeNano;
+							totalTimeMili = totalTimeNano / 1_000_000;
+						}
+					}else {
+						System.out.println("Puzzle is Not Solvable");
+					}
+					
+				}}catch(FileNotFoundException e) {
+					System.err.println("Error: File " + filePath +  " not found exception: ");
+					e.printStackTrace();
+				}
+				
+				System.out.println("-----------------------------------");
+				System.out.println(fileName.toString());
+				System.out.println("Average Cost: " + (costTotal / puzzleCount));
+				System.out.println("Average Total Time ns: " + (totalTimeNano / puzzleCount));
+				System.out.println("Averagge Total Time ms: " + (totalTimeMili / puzzleCount));
 				
 			}else {
 				System.out.print("Input Invalid, try again.");

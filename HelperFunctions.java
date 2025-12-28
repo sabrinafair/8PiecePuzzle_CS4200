@@ -1,11 +1,12 @@
 package puzzleSolver;
 
 import java.util.PriorityQueue;
+import java.util.function.Function;
 
-public final class HelperFunctions {
+public class HelperFunctions {
 
 	public record IntPair(int first, int second) {}
-
+	
 	public static void swapIndex(StringBuilder puzzle, int firstIndex, int secondIndex) {
 		//swap char at random index with char at i
 		char temp = puzzle.charAt(firstIndex);
@@ -28,18 +29,15 @@ public final class HelperFunctions {
 		return offset.first + offset.second;
 	}
 	
-	public static void pushOptionToPQ(int startIndex, int toIndex, PQNodeEntry parentNode, PriorityQueue PQ_H1, PriorityQueue PQ_H2) {
+	public static void pushOptionToPQ(int startIndex, int toIndex, PQNodeEntry parentNode, PriorityQueue PQ, Function<String, Integer> getH) {
 		if(toIndex != -1) {
 			StringBuilder currPuzzle = new StringBuilder(parentNode.getPuzzle());
 			swapIndex(currPuzzle, startIndex, toIndex);
 			
-			int h1 = getH1(currPuzzle.toString());
-			int h2 = getH2(currPuzzle.toString());
-			int totalCost_h1 = parentNode.getG() + 1 + h1;
-			int totalCost_h2 = parentNode.getG() + 1 + h2;
+			int h = getH.apply(currPuzzle.toString());
+			int totalCost = parentNode.getG() + 1 + h;
 			
-			PQ_H1.add(new PQNodeEntry(currPuzzle.toString(), totalCost_h1, parentNode, parentNode.getG() + 1, h1, h2));
-			PQ_H2.add(new PQNodeEntry(currPuzzle.toString(), totalCost_h2, parentNode, parentNode.getG() + 1, h1, h2));
+			PQ.add(new PQNodeEntry(currPuzzle.toString(), totalCost, parentNode, parentNode.getG() + 1, h));
 		}
 	}
 	
