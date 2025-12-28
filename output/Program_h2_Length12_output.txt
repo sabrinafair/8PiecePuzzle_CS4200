@@ -1,0 +1,555 @@
+CS 4200 - Project 1
+-------------------
+Single Test Puzzle
+-------------------
+Select Input Method
+[1] -------- Random
+[2] -------- Manual
+3
+Select H Function
+[1] -------- H1
+[2] -------- H2
+2
+Input File Path
+C:\Users\Sabrina Ferras\OneDrive - csumb.edu\Documents\CPP\5Winter2026\AI - CS 4200\Module 1\4200p1\project1\Length12.txt
+Puzzle: 
+0 2 5 
+1 6 8 
+4 3 7 
+Puzzle #1
+Step: 1
+1 2 5 
+0 6 8 
+4 3 7 
+Step: 2
+1 2 5 
+4 6 8 
+0 3 7 
+Step: 3
+1 2 5 
+4 6 8 
+3 0 7 
+Step: 4
+1 2 5 
+4 0 8 
+3 6 7 
+Step: 5
+1 2 5 
+0 4 8 
+3 6 7 
+Step: 6
+1 2 5 
+3 4 8 
+0 6 7 
+Step: 7
+1 2 5 
+3 4 8 
+6 0 7 
+Step: 8
+1 2 5 
+3 4 8 
+6 7 0 
+Step: 9
+1 2 5 
+3 4 0 
+6 7 8 
+Step: 10
+1 2 0 
+3 4 5 
+6 7 8 
+Step: 11
+1 0 2 
+3 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 90
+Time ns: 4575600
+Time ms: 4
+Puzzle: 
+0 3 5 
+2 7 4 
+1 6 8 
+Puzzle #2
+Step: 1
+2 3 5 
+0 7 4 
+1 6 8 
+Step: 2
+2 3 5 
+1 7 4 
+0 6 8 
+Step: 3
+2 3 5 
+1 7 4 
+6 0 8 
+Step: 4
+2 3 5 
+1 0 4 
+6 7 8 
+Step: 5
+2 0 5 
+1 3 4 
+6 7 8 
+Step: 6
+0 2 5 
+1 3 4 
+6 7 8 
+Step: 7
+1 2 5 
+0 3 4 
+6 7 8 
+Step: 8
+1 2 5 
+3 0 4 
+6 7 8 
+Step: 9
+1 2 5 
+3 4 0 
+6 7 8 
+Step: 10
+1 2 0 
+3 4 5 
+6 7 8 
+Step: 11
+1 0 2 
+3 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 84
+Time ns: 1571800
+Time ms: 1
+Puzzle: 
+4 2 0 
+1 6 3 
+7 8 5 
+Puzzle #3
+Step: 1
+4 0 2 
+1 6 3 
+7 8 5 
+Step: 2
+0 4 2 
+1 6 3 
+7 8 5 
+Step: 3
+1 4 2 
+0 6 3 
+7 8 5 
+Step: 4
+1 4 2 
+6 0 3 
+7 8 5 
+Step: 5
+1 4 2 
+6 3 0 
+7 8 5 
+Step: 6
+1 4 2 
+6 3 5 
+7 8 0 
+Step: 7
+1 4 2 
+6 3 5 
+7 0 8 
+Step: 8
+1 4 2 
+6 3 5 
+0 7 8 
+Step: 9
+1 4 2 
+0 3 5 
+6 7 8 
+Step: 10
+1 4 2 
+3 0 5 
+6 7 8 
+Step: 11
+1 0 2 
+3 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 86
+Time ns: 1551500
+Time ms: 1
+Puzzle: 
+1 5 4 
+6 0 3 
+7 8 2 
+Puzzle #4
+Step: 1
+1 5 4 
+6 3 0 
+7 8 2 
+Step: 2
+1 5 4 
+6 3 2 
+7 8 0 
+Step: 3
+1 5 4 
+6 3 2 
+7 0 8 
+Step: 4
+1 5 4 
+6 3 2 
+0 7 8 
+Step: 5
+1 5 4 
+0 3 2 
+6 7 8 
+Step: 6
+1 5 4 
+3 0 2 
+6 7 8 
+Step: 7
+1 0 4 
+3 5 2 
+6 7 8 
+Step: 8
+1 4 0 
+3 5 2 
+6 7 8 
+Step: 9
+1 4 2 
+3 5 0 
+6 7 8 
+Step: 10
+1 4 2 
+3 0 5 
+6 7 8 
+Step: 11
+1 0 2 
+3 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 90
+Time ns: 1103200
+Time ms: 1
+Puzzle: 
+1 2 8 
+3 0 7 
+6 4 5 
+Puzzle #5
+Step: 1
+1 2 8 
+3 4 7 
+6 0 5 
+Step: 2
+1 2 8 
+3 4 7 
+6 5 0 
+Step: 3
+1 2 8 
+3 4 0 
+6 5 7 
+Step: 4
+1 2 0 
+3 4 8 
+6 5 7 
+Step: 5
+1 0 2 
+3 4 8 
+6 5 7 
+Step: 6
+1 4 2 
+3 0 8 
+6 5 7 
+Step: 7
+1 4 2 
+3 5 8 
+6 0 7 
+Step: 8
+1 4 2 
+3 5 8 
+6 7 0 
+Step: 9
+1 4 2 
+3 5 0 
+6 7 8 
+Step: 10
+1 4 2 
+3 0 5 
+6 7 8 
+Step: 11
+1 0 2 
+3 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 82
+Time ns: 1140900
+Time ms: 1
+Puzzle: 
+4 7 2 
+1 5 8 
+0 3 6 
+Puzzle #6
+Step: 1
+4 7 2 
+1 5 8 
+3 0 6 
+Step: 2
+4 7 2 
+1 5 8 
+3 6 0 
+Step: 3
+4 7 2 
+1 5 0 
+3 6 8 
+Step: 4
+4 7 2 
+1 0 5 
+3 6 8 
+Step: 5
+4 0 2 
+1 7 5 
+3 6 8 
+Step: 6
+0 4 2 
+1 7 5 
+3 6 8 
+Step: 7
+1 4 2 
+0 7 5 
+3 6 8 
+Step: 8
+1 4 2 
+3 7 5 
+0 6 8 
+Step: 9
+1 4 2 
+3 7 5 
+6 0 8 
+Step: 10
+1 4 2 
+3 0 5 
+6 7 8 
+Step: 11
+1 0 2 
+3 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 88
+Time ns: 663400
+Time ms: 0
+Puzzle: 
+1 7 4 
+6 0 2 
+8 3 5 
+Puzzle #7
+Step: 1
+1 7 4 
+6 3 2 
+8 0 5 
+Step: 2
+1 7 4 
+6 3 2 
+0 8 5 
+Step: 3
+1 7 4 
+0 3 2 
+6 8 5 
+Step: 4
+1 7 4 
+3 0 2 
+6 8 5 
+Step: 5
+1 0 4 
+3 7 2 
+6 8 5 
+Step: 6
+1 4 0 
+3 7 2 
+6 8 5 
+Step: 7
+1 4 2 
+3 7 0 
+6 8 5 
+Step: 8
+1 4 2 
+3 7 5 
+6 8 0 
+Step: 9
+1 4 2 
+3 7 5 
+6 0 8 
+Step: 10
+1 4 2 
+3 0 5 
+6 7 8 
+Step: 11
+1 0 2 
+3 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 90
+Time ns: 669400
+Time ms: 0
+Puzzle: 
+1 4 2 
+6 3 5 
+7 8 0 
+Puzzle #8
+Step: 1
+1 4 2 
+6 3 5 
+7 0 8 
+Step: 2
+1 4 2 
+6 3 5 
+0 7 8 
+Step: 3
+1 4 2 
+0 3 5 
+6 7 8 
+Step: 4
+1 4 2 
+3 0 5 
+6 7 8 
+Step: 5
+1 0 2 
+3 4 5 
+6 7 8 
+Step: 6
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 24
+Time ns: 276100
+Time ms: 0
+Puzzle: 
+3 5 8 
+4 0 2 
+6 1 7 
+Puzzle #9
+Step: 1
+3 5 8 
+4 2 0 
+6 1 7 
+Step: 2
+3 5 0 
+4 2 8 
+6 1 7 
+Step: 3
+3 0 5 
+4 2 8 
+6 1 7 
+Step: 4
+3 2 5 
+4 0 8 
+6 1 7 
+Step: 5
+3 2 5 
+4 1 8 
+6 0 7 
+Step: 6
+3 2 5 
+4 1 8 
+6 7 0 
+Step: 7
+3 2 5 
+4 1 0 
+6 7 8 
+Step: 8
+3 2 0 
+4 1 5 
+6 7 8 
+Step: 9
+3 0 2 
+4 1 5 
+6 7 8 
+Step: 10
+3 1 2 
+4 0 5 
+6 7 8 
+Step: 11
+3 1 2 
+0 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 90
+Time ns: 675300
+Time ms: 0
+Puzzle: 
+5 4 1 
+6 3 2 
+0 7 8 
+Puzzle #10
+Step: 1
+5 4 1 
+0 3 2 
+6 7 8 
+Step: 2
+5 4 1 
+3 0 2 
+6 7 8 
+Step: 3
+5 0 1 
+3 4 2 
+6 7 8 
+Step: 4
+0 5 1 
+3 4 2 
+6 7 8 
+Step: 5
+3 5 1 
+0 4 2 
+6 7 8 
+Step: 6
+3 5 1 
+4 0 2 
+6 7 8 
+Step: 7
+3 0 1 
+4 5 2 
+6 7 8 
+Step: 8
+3 1 0 
+4 5 2 
+6 7 8 
+Step: 9
+3 1 2 
+4 5 0 
+6 7 8 
+Step: 10
+3 1 2 
+4 0 5 
+6 7 8 
+Step: 11
+3 1 2 
+0 4 5 
+6 7 8 
+Step: 12
+0 1 2 
+3 4 5 
+6 7 8 
+Search Cost: 64
+Time ns: 620300
+Time ms: 0
+-----------------------------------
+Length12.txt
+Average Cost: 78
+Average Total Time ns: 1284750
+Averagge Total Time ms: 1
